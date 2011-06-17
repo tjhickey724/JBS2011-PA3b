@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World, GameActivity!</string>
     <string name="app_name">PA3</string>
+    <string name="button1">PLAY GAME</string>
 </resources>

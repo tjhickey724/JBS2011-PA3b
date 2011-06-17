@@ -2,8 +2,6 @@ package jbs2011.tjhickey.pa3;
 
 import android.app.Activity;
 import android.os.Bundle;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import jbs2011.pa3.tjhickey.GameModel;
 import jbs2011.pa3.tjhickey.Disk;
@@ -21,41 +19,91 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.SurfaceHolder.Callback;
 import android.view.View.OnTouchListener;
+import android.content.res.Configuration;
+import android.util.Log;
 
 /**
- * When you tap the screen, bubbles appear on the screen. They expand and
- * eventually pop.
+ * This game consists of the user flinging disks into the air trying to hit
+ * a (red) target square without hitting static blocking element, initiallysquares. 
+ * If it does hit a static object, it becomes static itself making it harder
+ * to get to the target.  The user can grab a disk in flight and refling it
+ * but cannot drag it around the screen. The level ends when the target is hit
+ * and the game goes to the next level.
+ * 
+ * This game is a sketetal version of a simple game that was developed
+ * as part of Programming Assignment 3 for the Brandeis University JBS
+ * in Summer of 2011.
  */
 
 public class GameActivity extends Activity implements Callback {
 	/** Called when the activity is first created. */
 	private SurfaceView surface;
 	private SurfaceHolder holder;
-	private final GameModel model = new GameModel();
-	private final GameController controller = new GameController(this,model);
+	private GameModel model;
+	private GameController controller;
 	private GameLoop gameLoop;
 	private Paint backgroundPaint;
 	private Paint diskPaint, squarePaint, targetPaint;
-	
 
+	/**
+	 * When the activity starts we create a model, view, and controller for the game.
+	 * The model and controller are separate classes
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		System.out.println("staring the test method\n");
-
-		model.addSquare(150f, 50f, 50f);
-		model.addTarget(180f, 150f, 50f);
-		Disk d = model.addDisk(150f, 500f, 50f);
-		d.vx = 10;
-		d.vy = 102;
-
+		// setup a model for the game and initialize with the first level
+		 model = new GameModel();
+	     createLevel(2);
+		 
+        //  create the view which contqins a game_surface on which the game will be drawn
+        createPaints();
 		setContentView(R.layout.game);
-
+		// create the drawing surface and register this class as the callback listener
 		surface = (SurfaceView) findViewById(R.id.game_surface);
 		holder = surface.getHolder();
 		surface.getHolder().addCallback(this);
 
+		// Finally, create a controller for the game and set it up to listen for inputs
+		controller  = new GameController(this, model);
+		surface.setOnTouchListener(controller);
+
+	}
+	
+	public void onConfigurationChanged(Configuration newConfig) {
+	  super.onConfigurationChanged(newConfig);
+	}
+
+	
+	private void createLevel(int level){
+		switch (level){
+		case 1: // this is a simple level with 3 disks a square and a target, useful for debugging...
+			model.addSquare(150f, 50f, 50f);
+			model.addTarget(180f, 150f, 50f);
+			Disk d = model.addDisk(150f, 500f, 50f);
+			model.addDisk(300f, 500f, 30f);
+			model.addDisk(350f, 500f, 20f);
+			model.addDisk(400f, 500f, 10f);
+			d.vx = 10;
+			d.vy = 102;
+			break;
+			
+		
+		case 2: // this is a fun level with up to 30 visible blocks, 1 target and 5 disks..
+			for (int i=0;i<30; i++){
+				model.addSquare((float)Math.random()*1000,(float)Math.random()*900+100,(float)Math.random()*30+10);
+			}
+			model.addTarget((float)Math.random()*200+300,(float)Math.random()*200+300,50);
+			for (int i=0;i<5;i++)
+				model.addDisk(50f*i,50f,25f);
+			break;
+	  }
+	}
+	/*
+	 * The disk, square, and targets all have different colors
+	 */
+	private void createPaints(){
 		backgroundPaint = new Paint();
 		backgroundPaint.setColor(Color.BLUE);
 
@@ -70,9 +118,6 @@ public class GameActivity extends Activity implements Callback {
 		targetPaint = new Paint();
 		targetPaint.setColor(Color.RED);
 		targetPaint.setAntiAlias(true);
-
-		surface.setOnTouchListener(controller);
-
 	}
 
 	@Override
@@ -87,32 +132,42 @@ public class GameActivity extends Activity implements Callback {
 		// model.onResume(this);
 	}
 
+	
+	/**
+	 * When the drawing surface size changes we need to tell the controller so it
+	 * can adjust the mapping between the view and the model
+	 */
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		controller.setSize(width,height);
-		// model.setSize(width, height);
+		controller.setSize(width, height);
 	}
 
+		
+	/**
+	 *  When the drawing surface is created we start up a game loop,
+	 *  the game loop just draws the scene and updates the model in an infinite loop
+	 *  running in a separate thread. We create the thread and start it up here ...
+	 */
 	public void surfaceCreated(SurfaceHolder holder) {
-		gameLoop = new GameLoop();
+
+		gameLoop = new GameLoop(this,model,controller);
 		gameLoop.start();
 	}
 
-	private void draw() {
-		// TODO thread safety - the SurfaceView could go away while we are
-		// drawing
+	public void draw() {
 
 		Canvas c = null;
 		try {
-			// NOTE: in the LunarLander they don't have any synchronization
-			// here,
-			// so I guess this is OK. It will return null if the holder is not
-			// ready
 			c = holder.lockCanvas();
 
-			// TODO this needs to synchronize on something
 			if (c != null) {
 				doDraw(c);
+				if (model.levelOver){
+					model.resetGame();
+					createLevel(2);
+					model.levelOver=false;
+					
+				}
 			}
 		} finally {
 			if (c != null) {
@@ -121,11 +176,16 @@ public class GameActivity extends Activity implements Callback {
 		}
 	}
 
+	/*
+	 * The drawing method simply draws the disks, squares, and targets
+	 * after it paints the entire screen with the background color
+	 */
 	private void doDraw(Canvas c) {
 		int width = c.getWidth();
 		int height = c.getHeight();
-		controller.setSize(width,height);
-		
+		controller.setSize(width, height);
+		//Log.d("GA","w="+width+" h="+height);
+
 		c.drawRect(0, 0, width, height, backgroundPaint);
 
 		for (Disk d : model.disks) {
@@ -141,120 +201,18 @@ public class GameActivity extends Activity implements Callback {
 		}
 	}
 
+	/**
+	 * When the surface is destroyed we stop the game loop
+	 */
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		try {
-			// model.setSize(0,0);
 			gameLoop.safeStop();
 		} finally {
 			gameLoop = null;
 		}
 	}
 
-	private class GameLoop extends Thread {
-		private volatile boolean running = true;
+	
 
-		public void run() {
-			while (running) {
-				try {
-					// TODO don't like this hardcoding
-					TimeUnit.MILLISECONDS.sleep(5);
-
-					draw();
-					model.updateGame(System.currentTimeMillis());
-					/*
-					 * model.updateBubbles();
-					 */
-
-				} catch (InterruptedException ie) {
-					running = false;
-				}
-			}
-		}
-
-		public void safeStop() {
-			running = false;
-			interrupt();
-		}
-	}
-
-	enum State {
-		WAIT, TOUCH_DISK, DRAG_DISK, FLING_DISK, ROUND_OVER, TOUCH_SQUARE;
-	}
-
-	class GameController implements OnTouchListener {
-
-		private State currState;
-		private float firstX,firstY;
-		private Activity gameActivity;
-		private GameModel gameModel;
-		private Disk currDisk;
-		private Square currSquare;
-		private int width,height;
-		
-		
-
-		public GameController(Activity gameActivity, GameModel gameModel) {
-			this.gameActivity = gameActivity;
-			this.gameModel = gameModel;
-			currState = State.WAIT;
-			currDisk=null;
-			currSquare=null;
-		}
-
-		public void setSize(int w, int h){
-			width=w; height = h;
-		}
-		
-		/**
-		 * This measures the arc of the finger swipe and uses that to throw the
-		 * current disk ...
-		 */
-		public boolean onTouch(View v, MotionEvent event) {
-			Disk d; Square s;float x,y;
-			
-			// get x,y coordinates from view and translate
-			// to model coordinate system (with y=0 on bottom)
-			
-			x = event.getX();
-			y = height - event.getY();
-			
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				firstX = x;
-				firstY = y; 
-				if (((d=gameModel.touchingDisk(x,y))!= null) && (!d.isStatic) && (d.inside(x, y))){
-					currDisk=d;
-					d.vx=d.vy=0;
-					currState = State.TOUCH_DISK;
-				}else if  ((s=gameModel.touchingSquare(x,y))!= null){
-					currSquare = s;
-					currState = State.TOUCH_SQUARE;
-				}
-				return true;
-			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				if (currState == State.TOUCH_DISK) {
-					currDisk.move(firstX,firstY);
-				} else if (currState == State.TOUCH_SQUARE) {
-					currSquare.move(x,y);
-				} 
-				return true;
-			} else if (event.getAction() == MotionEvent.ACTION_UP) {
-				if (currState == State.TOUCH_DISK){
-					currState = State.WAIT;
-					float dx = x-firstX;
-					float dy = y-firstY;
-					currDisk.vx=dx;
-					currDisk.vy=dy;
-					currDisk = null;
-					return true;
-				} else if (currState == State.TOUCH_SQUARE){
-					currState = State.WAIT;
-					currSquare = null;
-					return true;
-				}
-
-			}
-			return false;
-		}
-	}
 
 }

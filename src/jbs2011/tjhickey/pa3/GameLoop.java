@@ -1,0 +1,62 @@
+package jbs2011.tjhickey.pa3;
+
+import java.util.concurrent.TimeUnit;
+import jbs2011.pa3.tjhickey.GameModel;
+
+
+/*
+ * The Game loop simply draws the screen and updates the game continuously ..
+ * It polls a variable running though and will exit the loop if running is set to false.
+ */
+public class GameLoop extends Thread {
+	private volatile boolean running = true;
+	GameActivity view;
+	GameModel model;
+	GameController controller;
+/**
+ * This defines the main loop of the game.
+ * It runs a simple loop where it draws the view,
+ * then updates the model until the model states the
+ * level is over, at which point it informs the controller
+ * which will reset the model and start over...
+ * @param view
+ * @param model
+ * @param controller
+ */
+	public GameLoop(GameActivity view, GameModel model, GameController controller){
+		this.model = model; this.controller= controller;
+		this.view = view;
+	}
+	
+	/**
+	 * the main draw/update until done loop
+	 */
+	public void run() {
+		while (running) {
+			try {
+				TimeUnit.MILLISECONDS.sleep(5);
+
+				view.draw();
+				if (!model.levelOver)
+				     model.updateGame(System.currentTimeMillis());
+				else controller.levelOver();
+				/*
+				 * model.updateBubbles();
+				 */
+
+			} catch (InterruptedException ie) {
+				running = false;
+			}
+		}
+	}
+
+	/**
+	 * if we need to exit the loop gracefully, this method
+	 * allows one to stop the loop without killing the 
+	 * thread directly.
+	 */
+	public void safeStop() {
+		running = false;
+		interrupt();
+	}
+}
