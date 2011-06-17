@@ -59,8 +59,6 @@ public class GameController implements OnTouchListener {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			Disk d;
 			Square s;
-			firstX = x;
-			firstY = y;
 			d = gameModel.touchingDisk(x, y);
 			s = gameModel.touchingSquare(x, y);
 			Log.d(TAG,"d="+d);
@@ -71,6 +69,9 @@ public class GameController implements OnTouchListener {
 				currDisk.vx = currDisk.vy = 0;
 				currDisk.weightless=true;
 				currState = State.TOUCH_DISK;
+				// record the position of the disk as we will use it when we let go of the disk, to fling it in ACTION_UP
+				firstX = d.x;
+				firstY = d.y;
 				Log.d(TAG,"TOUCH_DISK"+d);
 			} else if (s!= null) {
 				currSquare = s;
@@ -108,5 +109,11 @@ public class GameController implements OnTouchListener {
 	
 	public void levelOver(){
 		// this is called by the model when the user wins the game!
+		if (gameModel.levelOver){
+			gameModel.resetGame();
+			gameModel.createLevel(2);
+			gameModel.levelOver=false;
+			
+		}
 	}
 }

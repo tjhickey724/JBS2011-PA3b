@@ -55,7 +55,7 @@ public class GameActivity extends Activity implements Callback {
 
 		// setup a model for the game and initialize with the first level
 		 model = new GameModel();
-	     createLevel(2);
+
 		 
         //  create the view which contqins a game_surface on which the game will be drawn
         createPaints();
@@ -75,31 +75,7 @@ public class GameActivity extends Activity implements Callback {
 	  super.onConfigurationChanged(newConfig);
 	}
 
-	
-	private void createLevel(int level){
-		switch (level){
-		case 1: // this is a simple level with 3 disks a square and a target, useful for debugging...
-			model.addSquare(150f, 50f, 50f);
-			model.addTarget(180f, 150f, 50f);
-			Disk d = model.addDisk(150f, 500f, 50f);
-			model.addDisk(300f, 500f, 30f);
-			model.addDisk(350f, 500f, 20f);
-			model.addDisk(400f, 500f, 10f);
-			d.vx = 10;
-			d.vy = 102;
-			break;
-			
-		
-		case 2: // this is a fun level with up to 30 visible blocks, 1 target and 5 disks..
-			for (int i=0;i<30; i++){
-				model.addSquare((float)Math.random()*1000,(float)Math.random()*900+100,(float)Math.random()*30+10);
-			}
-			model.addTarget((float)Math.random()*200+300,(float)Math.random()*200+300,50);
-			for (int i=0;i<5;i++)
-				model.addDisk(50f*i,50f,25f);
-			break;
-	  }
-	}
+
 	/*
 	 * The disk, square, and targets all have different colors
 	 */
@@ -140,6 +116,7 @@ public class GameActivity extends Activity implements Callback {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		controller.setSize(width, height);
+
 	}
 
 		
@@ -152,6 +129,10 @@ public class GameActivity extends Activity implements Callback {
 
 		gameLoop = new GameLoop(this,model,controller);
 		gameLoop.start();
+		
+		synchronized(model){
+			model.createLevel(2);
+		}
 
 	}
 
@@ -163,12 +144,7 @@ public class GameActivity extends Activity implements Callback {
 
 			if (c != null) {
 				doDraw(c);
-				if (model.levelOver){
-					model.resetGame();
-					createLevel(2);
-					model.levelOver=false;
-					
-				}
+			
 			}
 		} finally {
 			if (c != null) {
