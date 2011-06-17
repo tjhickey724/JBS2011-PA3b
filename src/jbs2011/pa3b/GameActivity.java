@@ -44,6 +44,7 @@ public class GameActivity extends Activity implements Callback {
 	private GameLoop gameLoop;
 	private Paint backgroundPaint;
 	private Paint diskPaint, squarePaint, targetPaint;
+	private static final String TAG="GA";
 
 	/**
 	 * When the activity starts we create a model, view, and controller for the game.
@@ -65,9 +66,17 @@ public class GameActivity extends Activity implements Callback {
 		holder = surface.getHolder();
 		surface.getHolder().addCallback(this);
 
-		// Finally, create a controller for the game and set it up to listen for inputs
+		// Next, create a controller for the game and set it up to listen for inputs
 		controller  = new GameController(this, model);
 		surface.setOnTouchListener(controller);
+		
+		// Finally, start the game loop!
+		gameLoop = new GameLoop(this,model,controller);
+		gameLoop.start();
+		Log.d(TAG,"surface created");
+		//model.createLevel(2);
+
+
 
 	}
 	
@@ -127,13 +136,6 @@ public class GameActivity extends Activity implements Callback {
 	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 
-		gameLoop = new GameLoop(this,model,controller);
-		gameLoop.start();
-		
-		synchronized(model){
-			model.createLevel(2);
-		}
-
 	}
 
 	public void draw() {
@@ -161,6 +163,7 @@ public class GameActivity extends Activity implements Callback {
 		int width = c.getWidth();
 		int height = c.getHeight();
 		controller.setSize(width, height);
+
 		//Log.d("GA","w="+width+" h="+height);
 
 		c.drawRect(0, 0, width, height, backgroundPaint);

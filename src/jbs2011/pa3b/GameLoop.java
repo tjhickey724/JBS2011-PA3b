@@ -2,6 +2,7 @@ package jbs2011.pa3b;
 
 import java.util.concurrent.TimeUnit;
 import jbs2011.pa3.GameModel;
+import android.util.Log;
 
 
 /*
@@ -10,6 +11,7 @@ import jbs2011.pa3.GameModel;
  */
 public class GameLoop extends Thread {
 	private volatile boolean running = true;
+	private static final String TAG="GL";
 	GameActivity view;
 	GameModel model;
 	GameController controller;
@@ -26,6 +28,7 @@ public class GameLoop extends Thread {
 	public GameLoop(GameActivity view, GameModel model, GameController controller){
 		this.model = model; this.controller= controller;
 		this.view = view;
+		Log.d(TAG,"starting another GameLoop");
 	}
 	
 	/**

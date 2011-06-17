@@ -38,6 +38,14 @@ public class GameController implements OnTouchListener {
 	public void setSize(int w, int h) {
 		width = w;
 		height = h;
+		//Log.d(TAG,"w="+w+"  h="+h);
+		synchronized(gameModel){
+		if (gameModel.levelOver){
+			gameModel.resetGame();
+			gameModel.createLevel(2,width,height);
+			gameModel.levelOver=false;
+		}
+		}
 	}
 
 	/**
@@ -110,8 +118,12 @@ public class GameController implements OnTouchListener {
 	public void levelOver(){
 		// this is called by the model when the user wins the game!
 		if (gameModel.levelOver){
+
 			gameModel.resetGame();
 			gameModel.createLevel(2);
+			for(Square s:gameModel.targets){
+				Log.d(TAG,"target = "+s);
+			}
 			gameModel.levelOver=false;
 			
 		}
