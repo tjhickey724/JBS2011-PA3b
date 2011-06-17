@@ -1,4 +1,4 @@
-package jbs2011.tjhickey.pa3;
+package jbs2011.pa3b;
 
 
 public enum State {

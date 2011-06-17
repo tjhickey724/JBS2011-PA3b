@@ -1,8 +1,8 @@
-package jbs2011.tjhickey.pa3;
+package jbs2011.pa3b;
 
-import jbs2011.pa3.tjhickey.Disk;
-import jbs2011.pa3.tjhickey.GameModel;
-import jbs2011.pa3.tjhickey.Square;
+import jbs2011.pa3.Disk;
+import jbs2011.pa3.GameModel;
+import jbs2011.pa3.Square;
 import android.app.Activity;
 import android.view.MotionEvent;
 import android.view.View;

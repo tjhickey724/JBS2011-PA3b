@@ -1,4 +1,7 @@
 *.class
 *.apk
 *.ap_
+*.dex
+*~
 gen/*
+doc/*
