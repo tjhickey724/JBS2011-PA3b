@@ -35,11 +35,15 @@ public class GameLoop extends Thread {
 		while (running) {
 			try {
 				TimeUnit.MILLISECONDS.sleep(5);
-
+				synchronized(view){
 				view.draw();
+				}
 				if (!model.levelOver)
+					synchronized(model){
 				     model.updateGame(System.currentTimeMillis());
+					}
 				else controller.levelOver();
+					
 				/*
 				 * model.updateBubbles();
 				 */

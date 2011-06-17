@@ -51,7 +51,7 @@ public class GameController implements OnTouchListener {
 
 		// get x,y coordinates from view and translate
 		// to model coordinate system (with y=0 on bottom)
-
+		synchronized(gameModel){
 		x = event.getX();
 		y = height - event.getY();
         Log.d(TAG,"x="+x+"  y="+y+"h-y="+(height-y)+" currState="+currState+" firstX="+firstX+" firstY="+firstY);
@@ -68,7 +68,8 @@ public class GameController implements OnTouchListener {
 			
 			if ((d != null) && (!d.isStatic)) {
 				currDisk = d;
-				d.vx = d.vy = 0;
+				currDisk.vx = currDisk.vy = 0;
+				currDisk.weightless=true;
 				currState = State.TOUCH_DISK;
 				Log.d(TAG,"TOUCH_DISK"+d);
 			} else if (s!= null) {
@@ -91,6 +92,7 @@ public class GameController implements OnTouchListener {
 				float dy = y - firstY;
 				currDisk.vx = dx;
 				currDisk.vy = dy;
+				currDisk.weightless=false;
 				currDisk = null;
 				return true;
 			} else if (currState == State.TOUCH_SQUARE) {
@@ -101,6 +103,7 @@ public class GameController implements OnTouchListener {
 
 		}
 		return false;
+		}
 	}
 	
 	public void levelOver(){

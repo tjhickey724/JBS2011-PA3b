@@ -152,6 +152,7 @@ public class GameActivity extends Activity implements Callback {
 
 		gameLoop = new GameLoop(this,model,controller);
 		gameLoop.start();
+
 	}
 
 	public void draw() {
