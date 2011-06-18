@@ -28,6 +28,7 @@ public class GameController implements OnTouchListener {
 	private Disk currDisk;
 	private Square currSquare;
 	private int width, height;
+	private float zoom=1.0f; // this doesn't seem to work correctly with zoom != 1f
 	private final static String TAG="GC";
 
 	/**
@@ -54,33 +55,42 @@ public class GameController implements OnTouchListener {
 	}
 	
 	/**
-	 * Convert from View coordinats to Model Coordinates
+	 * Convert from PointF p from View coordinats to Model Coordinates
 	 * @param p
 	 * @return
 	 */
 	public PointF viewToModel(PointF p){
-		PointF q = new PointF(p.x,height-p.y);
+		PointF q = new PointF(p.x*zoom,height-p.y*zoom);
 		return q;		
 	}
 	
 	
 	/**
-	 * Convert from Model coordinats to View Coordinates
+	 * Convert PointF p from Model coordinats to View Coordinates
 	 * @param p
 	 * @return
 	 */
 	public PointF modelToView(PointF p){
-		PointF q = new PointF(p.x,height-p.y);
+		PointF q = new PointF(p.x/zoom,height-p.y/zoom);
 		return q;		
 	}
 	
-	
+	/**
+	 * Convert disk d from model coordinates to view coordinates
+	 * @param d
+	 * @return
+	 */
 	public Disk modelToView(Disk d){
-		return new Disk(d.x,height-d.y,d.r);
+		return new Disk(d.x/zoom,height-d.y/zoom,d.r/zoom);
 	}
 	
+	/**
+	 * convert square s from model coordinates to view coordinates
+	 * @param s
+	 * @return
+	 */
 	public Square modelToView(Square s){
-		return new Square(s.x,height-s.y,s.w,s.isTarget);
+		return new Square(s.x/zoom,height-s.y/zoom,s.w/zoom,s.isTarget);
 	}
 	
 	
