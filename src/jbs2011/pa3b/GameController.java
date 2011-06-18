@@ -57,7 +57,7 @@ public class GameController implements OnTouchListener {
 	/**
 	 * Convert from PointF p from View coordinats to Model Coordinates
 	 * @param p
-	 * @return
+	 * @return q
 	 */
 	public PointF viewToModel(PointF p){
 		PointF q = new PointF(p.x*zoom,(height-p.y)*zoom);
@@ -68,7 +68,7 @@ public class GameController implements OnTouchListener {
 	/**
 	 * Convert PointF p from Model coordinats to View Coordinates
 	 * @param p
-	 * @return
+	 * @return q
 	 */
 	public PointF modelToView(PointF p){
 		PointF q = new PointF(p.x/zoom,height-p.y/zoom);
@@ -78,7 +78,7 @@ public class GameController implements OnTouchListener {
 	/**
 	 * Convert disk d from model coordinates to view coordinates
 	 * @param d
-	 * @return
+	 * @return q
 	 */
 	public Disk modelToView(Disk d){
 		return new Disk(d.x/zoom,height-d.y/zoom,d.r/zoom);
@@ -87,7 +87,7 @@ public class GameController implements OnTouchListener {
 	/**
 	 * convert square s from model coordinates to view coordinates
 	 * @param s
-	 * @return
+	 * @return new square
 	 */
 	public Square modelToView(Square s){
 		return new Square(s.x/zoom,height-s.y/zoom,s.w/zoom,s.isTarget);
