@@ -39,13 +39,7 @@ public class GameController implements OnTouchListener {
 		width = w;
 		height = h;
 		//Log.d(TAG,"w="+w+"  h="+h);
-		synchronized(gameModel){
-		if (gameModel.levelOver){
-			gameModel.resetGame();
-			gameModel.createLevel(2,width,height);
-			gameModel.levelOver=false;
-		}
-		}
+
 	}
 
 	/**
