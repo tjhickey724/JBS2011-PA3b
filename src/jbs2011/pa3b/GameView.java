@@ -92,7 +92,7 @@ public class GameView  implements Callback{
 	private void doDraw(Canvas c) {
 		int width = c.getWidth();
 		int height = c.getHeight();
-		controller.setSize(width, height);
+		// controller.setSize(width, height);
 
 		//Log.d("GA","w="+width+" h="+height);
 
