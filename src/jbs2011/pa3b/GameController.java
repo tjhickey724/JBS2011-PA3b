@@ -20,21 +20,28 @@ public class GameController implements OnTouchListener {
 
 	private State currState;
 	private float firstX, firstY;
-	private Activity gameActivity;
 	private GameModel gameModel;
 	private Disk currDisk;
 	private Square currSquare;
 	private int width, height;
 	private final static String TAG="GC";
 
-	public GameController(Activity gameActivity, GameModel gameModel) {
-		this.gameActivity = gameActivity;
+	/**
+	 * This processes all user input to the game and uses that input to update the model.
+	 * It allows the user to grab disks and squares and move them or flick them and so needs
+	 * to keep track of the currently "selected" disk or square...
+	 * @param gameModel
+	 */
+	public GameController(GameModel gameModel) {
 		this.gameModel = gameModel;
 		currState = State.WAIT;
 		currDisk = null;
 		currSquare = null;
 	}
 
+	/**
+	 * Update the width and height of the playing area.
+	 */
 	public void setSize(int w, int h) {
 		width = w;
 		height = h;
@@ -109,9 +116,14 @@ public class GameController implements OnTouchListener {
 		}
 	}
 	
+	/**
+	 * this is called from the GameLoop when it detects the game is over.
+	 * It resets the game and creates a new level
+	 */
 	public void levelOver(){
 		// this is called by the model when the user wins the game!
 		if (gameModel.levelOver){
+			synchronized(gameModel){
 
 			gameModel.resetGame();
 			gameModel.createLevel(2);
@@ -119,6 +131,7 @@ public class GameController implements OnTouchListener {
 				Log.d(TAG,"target = "+s);
 			}
 			gameModel.levelOver=false;
+			}
 			
 		}
 	}

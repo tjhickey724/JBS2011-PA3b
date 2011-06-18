@@ -58,7 +58,7 @@ public class GameActivity extends Activity {
 
 		// Next, create the GameController, pass it the model
 		// and set it up to listen for game inputs sent to the Surface
-		controller  = new GameController(this, model);
+		controller  = new GameController(model);
 		surface.setOnTouchListener(controller);
 		
 		// Next, create the GameView which will draw on the Surface (as a back buffer!)
