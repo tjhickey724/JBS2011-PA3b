@@ -99,15 +99,18 @@ public class GameView  implements Callback{
 		c.drawRect(0, 0, width, height, backgroundPaint);
 
 		for (Disk d : model.disks) {
-			c.drawCircle(d.x, height - d.y, d.r, diskPaint);
+			d=controller.modelToView(d);
+			c.drawCircle(d.x, d.y, d.r, diskPaint);
 		}
 		for (Square d : model.squares) {
-			c.drawRect(d.x - d.w / 2, height - (d.y + d.w / 2), d.x + d.w / 2,
-					height - (d.y - d.w / 2), squarePaint);
+			d=controller.modelToView(d);
+			c.drawRect(d.x - d.w / 2, (d.y - d.w / 2), d.x + d.w / 2,
+					(d.y + d.w / 2), squarePaint);
 		}
 		for (Square d : model.targets) {
-			c.drawRect(d.x - d.w / 2, height - (d.y + d.w / 2), d.x + d.w / 2,
-					height - (d.y - d.w / 2), targetPaint);
+			d=controller.modelToView(d);
+			c.drawRect(d.x - d.w / 2, (d.y - d.w / 2), d.x + d.w / 2,
+					(d.y + d.w / 2), targetPaint);
 		}
 	}
 

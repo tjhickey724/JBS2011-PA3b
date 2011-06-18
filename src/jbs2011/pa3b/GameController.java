@@ -8,11 +8,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
+import android.graphics.PointF;
+
 import android.util.Log;
 
 /**
  * This takes input from the user and uses it to make corresponding changes to the model
- * and/or the view.
+ * and/or the view. This also keeps track of the mapping from model to view and vice versa
+ * ((It might be better to have that functionality in the GameView class, but I like all the
+ * logic to be in the GameController.)) 
  * @author tim
  *
  */
@@ -48,6 +52,38 @@ public class GameController implements OnTouchListener {
 		//Log.d(TAG,"w="+w+"  h="+h);
 
 	}
+	
+	/**
+	 * Convert from View coordinats to Model Coordinates
+	 * @param p
+	 * @return
+	 */
+	public PointF viewToModel(PointF p){
+		PointF q = new PointF(p.x,height-p.y);
+		return q;		
+	}
+	
+	
+	/**
+	 * Convert from Model coordinats to View Coordinates
+	 * @param p
+	 * @return
+	 */
+	public PointF modelToView(PointF p){
+		PointF q = new PointF(p.x,height-p.y);
+		return q;		
+	}
+	
+	
+	public Disk modelToView(Disk d){
+		return new Disk(d.x,height-d.y,d.r);
+	}
+	
+	public Square modelToView(Square s){
+		return new Square(s.x,height-s.y,s.w,s.isTarget);
+	}
+	
+	
 
 	/**
 	 * This handles all events in which the user touches the screen.
@@ -55,14 +91,19 @@ public class GameController implements OnTouchListener {
 	 * or the user can touch a disk and flick it toward the target.
 	 */
 	public boolean onTouch(View v, MotionEvent event) {
-
+        PointF p;
 		float x, y;
 
 		// get x,y coordinates from view and translate
 		// to model coordinate system (with y=0 on bottom)
 		synchronized(gameModel){
-		x = event.getX();
-		y = height - event.getY();
+			// at this point we convert from raw coordinates to the model coordinates
+			// raw coordinates have the origin (0,0) at the upper left corner, but the
+			// model system has it at the lower left corner.
+			// The View may need to use this transformation to draw on the screen.....
+		p = viewToModel(new PointF(event.getX(),event.getY()));
+		x = p.x;
+		y = p.y;
         Log.d(TAG,"x="+x+"  y="+y+"h-y="+(height-y)+" currState="+currState+" firstX="+firstX+" firstY="+firstY);
 
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
