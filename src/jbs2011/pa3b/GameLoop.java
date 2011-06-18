@@ -9,6 +9,8 @@ import android.util.Log;
  * The Game loop simply draws the screen and updates the game continuously ..
  * It polls a variable running though and will exit the loop if running is set to false.
  * This class is the only one that ever draws on the Surface!
+ * The Game loop also calls a method in the controller to convert model coordinates to
+ * view coordinates for the model objects (disk, square).
  */
 public class GameLoop extends Thread {
 	private volatile boolean running = true;

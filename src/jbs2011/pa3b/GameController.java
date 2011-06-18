@@ -97,8 +97,16 @@ public class GameController implements OnTouchListener {
 
 	/**
 	 * This handles all events in which the user touches the screen.
-	 * For example, the user can touch a square and drag it to a new position,
-	 * or the user can touch a disk and flick it toward the target.
+	 * Currently, the user can touch a disk and drag in a direction, when the
+	 * user lifts their finger the disk shoots off in that direction with a speed relative
+	 * to the distance from the original position. The disk stays fixed while the finger drags
+	 * (really we should have a rubber band object to visualize this). The user doesn't have to
+	 * exactly touch the disk, it takes the closest disk to the touch within 100 pixels (or some other limit ...)
+	 * 
+	 * Also, the user can touch a square a drag it to another location.
+	 * 
+	 * All other touch events are ignored for now
+	 * 
 	 */
 	public boolean onTouch(View v, MotionEvent event) {
         PointF p;
@@ -168,8 +176,9 @@ public class GameController implements OnTouchListener {
 	}
 	
 	/**
-	 * this is called from the GameLoop when it detects the game is over.
-	 * It resets the game and creates a new level
+	 * this is called from the GameLoop when it polls the model and detects that the game is over.
+	 * It resets the game and creates a new level. Another possibility would be to go to a level completed activity....
+	 * but we don't do that yet...
 	 */
 	public void levelOver(){
 		// this is called by the model when the user wins the game!
