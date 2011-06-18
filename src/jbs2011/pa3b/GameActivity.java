@@ -1,25 +1,17 @@
 package jbs2011.pa3b;
 
-import android.app.Activity;
-import android.os.Bundle;
-import java.util.concurrent.TimeUnit;
+
 import jbs2011.pa3.GameModel;
-import jbs2011.pa3.Disk;
-import jbs2011.pa3.Square;
 
 import android.app.Activity;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.hardware.SensorListener;
+
 import android.os.Bundle;
-import android.view.MotionEvent;
+
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.SurfaceHolder.Callback;
-import android.view.View.OnTouchListener;
+
 import android.content.res.Configuration;
+
 import android.util.Log;
 
 /**
@@ -35,15 +27,14 @@ import android.util.Log;
  * in Summer of 2011.
  */
 
-public class GameActivity extends Activity implements Callback {
+public class GameActivity extends Activity {
 	/** Called when the activity is first created. */
 	private SurfaceView surface;
 	private SurfaceHolder holder;
 	private GameModel model;
+	private GameView view;
 	private GameController controller;
-	private GameLoop gameLoop;
-	private Paint backgroundPaint;
-	private Paint diskPaint, squarePaint, targetPaint;
+
 	private static final String TAG="GA";
 
 	/**
@@ -54,25 +45,28 @@ public class GameActivity extends Activity implements Callback {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// setup a model for the game and initialize with the first level
+		// setup a model for the game
 		 model = new GameModel();
 
 		 
         //  create the view which contqins a game_surface on which the game will be drawn
-        createPaints();
 		setContentView(R.layout.game);
-		// create the drawing surface and register this class as the callback listener
+		// the drawing surface is created in the xml, get the surface from its ID
 		surface = (SurfaceView) findViewById(R.id.game_surface);
 		holder = surface.getHolder();
-		surface.getHolder().addCallback(this);
 
-		// Next, create a controller for the game and set it up to listen for inputs
+
+		// Next, create the GameController, pass it the model
+		// and set it up to listen for game inputs sent to the Surface
 		controller  = new GameController(this, model);
 		surface.setOnTouchListener(controller);
 		
-		// Finally, start the game loop!
-		gameLoop = new GameLoop(this,model,controller);
-		gameLoop.start();
+		// Next, create the GameView which will draw on the Surface (as a back buffer!)
+		// The view also handles the creation, resize, and destroy events for the surface
+		view = new GameView(controller, holder, model);
+		surface.getHolder().addCallback(view);
+		
+
 		Log.d(TAG,"surface created");
 		//model.createLevel(2);
 
@@ -84,26 +78,6 @@ public class GameActivity extends Activity implements Callback {
 	  super.onConfigurationChanged(newConfig);
 	}
 
-
-	/*
-	 * The disk, square, and targets all have different colors
-	 */
-	private void createPaints(){
-		backgroundPaint = new Paint();
-		backgroundPaint.setColor(Color.BLUE);
-
-		diskPaint = new Paint();
-		diskPaint.setColor(Color.BLACK);
-		diskPaint.setAntiAlias(true);
-
-		squarePaint = new Paint();
-		squarePaint.setColor(Color.WHITE);
-		squarePaint.setAntiAlias(true);
-
-		targetPaint = new Paint();
-		targetPaint.setColor(Color.RED);
-		targetPaint.setAntiAlias(true);
-	}
 
 	@Override
 	protected void onPause() {
@@ -118,81 +92,7 @@ public class GameActivity extends Activity implements Callback {
 	}
 
 	
-	/**
-	 * When the drawing surface size changes we need to tell the controller so it
-	 * can adjust the mapping between the view and the model
-	 */
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		controller.setSize(width, height);
 
-	}
-
-		
-	/**
-	 *  When the drawing surface is created we start up a game loop,
-	 *  the game loop just draws the scene and updates the model in an infinite loop
-	 *  running in a separate thread. We create the thread and start it up here ...
-	 */
-	public void surfaceCreated(SurfaceHolder holder) {
-
-	}
-
-	public void draw() {
-
-		Canvas c = null;
-		try {
-			c = holder.lockCanvas();
-
-			if (c != null) {
-				doDraw(c);
-			
-			}
-		} finally {
-			if (c != null) {
-				holder.unlockCanvasAndPost(c);
-			}
-		}
-	}
-
-	/*
-	 * The drawing method simply draws the disks, squares, and targets
-	 * after it paints the entire screen with the background color
-	 */
-	private void doDraw(Canvas c) {
-		int width = c.getWidth();
-		int height = c.getHeight();
-		controller.setSize(width, height);
-
-		//Log.d("GA","w="+width+" h="+height);
-
-		c.drawRect(0, 0, width, height, backgroundPaint);
-
-		for (Disk d : model.disks) {
-			c.drawCircle(d.x, height - d.y, d.r, diskPaint);
-		}
-		for (Square d : model.squares) {
-			c.drawRect(d.x - d.w / 2, height - (d.y + d.w / 2), d.x + d.w / 2,
-					height - (d.y - d.w / 2), squarePaint);
-		}
-		for (Square d : model.targets) {
-			c.drawRect(d.x - d.w / 2, height - (d.y + d.w / 2), d.x + d.w / 2,
-					height - (d.y - d.w / 2), targetPaint);
-		}
-	}
-
-	/**
-	 * When the surface is destroyed we stop the game loop
-	 */
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		try {
-			gameLoop.safeStop();
-		} finally {
-			gameLoop = null;
-		}
-	}
-
-	
 
 
 }

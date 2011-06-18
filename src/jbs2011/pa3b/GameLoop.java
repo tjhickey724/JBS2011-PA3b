@@ -8,11 +8,12 @@ import android.util.Log;
 /*
  * The Game loop simply draws the screen and updates the game continuously ..
  * It polls a variable running though and will exit the loop if running is set to false.
+ * This class is the only one that ever draws on the Surface!
  */
 public class GameLoop extends Thread {
 	private volatile boolean running = true;
 	private static final String TAG="GL";
-	GameActivity view;
+	GameView view;
 	GameModel model;
 	GameController controller;
 /**
@@ -25,7 +26,7 @@ public class GameLoop extends Thread {
  * @param model
  * @param controller
  */
-	public GameLoop(GameActivity view, GameModel model, GameController controller){
+	public GameLoop(GameView view, GameModel model, GameController controller){
 		this.model = model; this.controller= controller;
 		this.view = view;
 		Log.d(TAG,"starting another GameLoop");
