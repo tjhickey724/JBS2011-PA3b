@@ -60,7 +60,7 @@ public class GameController implements OnTouchListener {
 	 * @return
 	 */
 	public PointF viewToModel(PointF p){
-		PointF q = new PointF(p.x*zoom,height-p.y*zoom);
+		PointF q = new PointF(p.x*zoom,(height-p.y)*zoom);
 		return q;		
 	}
 	
