@@ -26,7 +26,7 @@ public class GameView  implements Callback{
 	private GameModel model;
 	private GameLoop gameLoop;
 	private Paint backgroundPaint;
-	private Paint diskPaint, squarePaint, targetPaint;
+	private Paint diskPaint, squarePaint, targetPaint,textPaint;
 	
 	public GameView(GameController controller,SurfaceHolder holder,GameModel model){
 		this.controller=controller;
@@ -97,6 +97,8 @@ public class GameView  implements Callback{
 		//Log.d("GA","w="+width+" h="+height);
 
 		c.drawRect(0, 0, width, height, backgroundPaint);
+		
+
 
 		for (Disk d : model.disks) {
 			d=controller.modelToView(d);
@@ -112,6 +114,8 @@ public class GameView  implements Callback{
 			c.drawRect(d.x - d.w / 2, (d.y - d.w / 2), d.x + d.w / 2,
 					(d.y + d.w / 2), targetPaint);
 		}
+		
+		c.drawText("["+Math.round(model.timeRemaining)+"]",0,50,textPaint);
 	}
 
 	/**
@@ -144,6 +148,12 @@ public class GameView  implements Callback{
 		targetPaint = new Paint();
 		targetPaint.setColor(Color.RED);
 		targetPaint.setAntiAlias(true);
+		
+		textPaint = new Paint();
+		textPaint.setColor(Color.GREEN);
+		textPaint.setAntiAlias(true);
+		textPaint.setTextSize(40);
+		
 	}
 
 	
