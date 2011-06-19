@@ -186,7 +186,7 @@ public class GameController implements OnTouchListener {
 			synchronized(gameModel){
 
 			gameModel.resetGame();
-			gameModel.createLevel(2);
+			gameModel.createLevel(2,width,height);
 			for(Square s:gameModel.targets){
 				Log.d(TAG,"target = "+s);
 			}

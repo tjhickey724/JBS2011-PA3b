@@ -92,7 +92,7 @@ public class GameView  implements Callback{
 	private void doDraw(Canvas c) {
 		int width = c.getWidth();
 		int height = c.getHeight();
-		// controller.setSize(width, height);
+		controller.setSize(width, height);
 
 		//Log.d("GA","w="+width+" h="+height);
 
@@ -115,7 +115,7 @@ public class GameView  implements Callback{
 					(d.y + d.w / 2), targetPaint);
 		}
 		
-		c.drawText("["+Math.round(model.timeRemaining)+"]",0,50,textPaint);
+		c.drawText("["+Math.round(model.timeRemaining)+"] win="+model.wins+" lose="+model.losses,0,50,textPaint);
 	}
 
 	/**
