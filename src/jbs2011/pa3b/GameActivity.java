@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 
 import android.util.Log;
@@ -67,15 +68,17 @@ public class GameActivity extends Activity {
 		surface.getHolder().addCallback(view);
 		
 
-		Log.d(TAG,"surface created");
+		Log.d(TAG,"surface created! ");
 		//model.createLevel(2);
 
 
 
 	}
 	
+	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
-	  super.onConfigurationChanged(newConfig);
+	    super.onConfigurationChanged(newConfig);
+	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 	}
 
 
