@@ -40,7 +40,7 @@ public class GameLoop extends Thread {
 	public void run() {
 		while (running) {
 			try {
-				TimeUnit.MILLISECONDS.sleep(5);
+				TimeUnit.MILLISECONDS.sleep(10);
 				synchronized(view){
 				view.draw();
 				}
