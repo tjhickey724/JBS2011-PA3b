@@ -30,7 +30,7 @@ public class GameActivity extends Activity {
 
 	private static final String TAG="GA";
 	
-	public GameActivity(GameModel mod, GameController cont) {
+	public GameActivity(GameModel mod, GameController cont, GameView view) {
 		model = mod;
 		controller = cont;
 	}
@@ -65,16 +65,6 @@ public class GameActivity extends Activity {
 		surface = (SurfaceView) findViewById(surfaceView);
 
 		holder = surface.getHolder();
-
-
-		// Next, create the GameController, pass it the model
-		// and set it up to listen for game inputs sent to the Surface
-		controller  = new GameController(model);
-		surface.setOnTouchListener(controller);
-		
-		// Next, create the GameView which will draw on the Surface (as a back buffer!)
-		// The view also handles the creation, resize, and destroy events for the surface
-		view = new GameView(controller, holder, model);
 		surface.getHolder().addCallback(view);
 		
 
