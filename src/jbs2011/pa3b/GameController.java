@@ -30,6 +30,7 @@ public class GameController implements OnTouchListener {
 	private int width, height;
 	private float zoom=1.0f; // this doesn't seem to work correctly with zoom != 1f
 	private final static String TAG="GC";
+	long startTime=0;
 
 	/**
 	 * This processes all user input to the game and uses that input to update the model.
@@ -112,6 +113,7 @@ public class GameController implements OnTouchListener {
         PointF p;
 		float x, y;
 
+
 		// get x,y coordinates from view and translate
 		// to model coordinate system (with y=0 on bottom)
 		synchronized(gameModel){
@@ -134,12 +136,15 @@ public class GameController implements OnTouchListener {
 			
 			if ((d != null) && (!d.isStatic)) {
 				currDisk = d;
+				if ((d.vx!=0)||(d.vy!=0))
+					return true;
 				currDisk.vx = currDisk.vy = 0;
-				currDisk.weightless=true;
+				//currDisk.weightless=true;
 				currState = State.TOUCH_DISK;
 				// record the position of the disk as we will use it when we let go of the disk, to fling it in ACTION_UP
 				firstX = d.x;
 				firstY = d.y;
+				startTime = System.currentTimeMillis();
 				Log.d(TAG,"TOUCH_DISK"+d);
 			} else if (s!= null) {
 				currSquare = s;
@@ -159,9 +164,15 @@ public class GameController implements OnTouchListener {
 				currState = State.WAIT;
 				float dx = x - firstX;
 				float dy = y - firstY;
-				currDisk.vx = dx;
-				currDisk.vy = dy;
-				currDisk.weightless=false;
+				float dt = (System.currentTimeMillis() - startTime)/500f;
+				if (Math.abs(dx)<20){
+					currDisk.vx = 0;
+					currDisk.vy = 200; //dy/dt;
+				}else {
+					currDisk.vx = 0;
+					currDisk.vy = dy/dt;
+				}
+				// currDisk.weightless=false;
 				currDisk = null;
 				return true;
 			} else if (currState == State.TOUCH_SQUARE) {

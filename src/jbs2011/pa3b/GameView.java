@@ -3,11 +3,15 @@ package jbs2011.pa3b;
 import jbs2011.pa3.GameModel;
 import jbs2011.pa3.Disk;
 import jbs2011.pa3.Square;
+import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
+import android.graphics.Bitmap;
+
 
 
 /**
@@ -27,12 +31,17 @@ public class GameView  implements Callback{
 	private GameLoop gameLoop;
 	private Paint backgroundPaint;
 	private Paint diskPaint, squarePaint, targetPaint,textPaint;
+	private Bitmap background,player,playerD;
 	
-	public GameView(GameController controller,SurfaceHolder holder,GameModel model){
+	public GameView(Context context, GameController controller,SurfaceHolder holder,GameModel model){
 		this.controller=controller;
 		this.holder = holder;
 		this.model=model;
         createPaints();
+        background = BitmapFactory.decodeResource(context.getResources(), R.drawable.castle);
+        player = BitmapFactory.decodeResource(context.getResources(), R.drawable.wine);
+
+    	
         
 
 	}
@@ -96,14 +105,23 @@ public class GameView  implements Callback{
 
 		//Log.d("GA","w="+width+" h="+height);
 
-		c.drawRect(0, 0, width, height, backgroundPaint);
-		
+		// draw the background (tiled)
+		c.drawRect(0, 0, width, height, backgroundPaint);		
+		c.drawBitmap(background, model.backgroundOffset, 0, null);
+		c.drawBitmap(background , model.backgroundOffset+model.backgroundWidth, 0, null);
+		c.drawBitmap(background , model.backgroundOffset+2*model.backgroundWidth, 0, null);
 
-
+		//draw the disks
 		for (Disk d : model.disks) {
 			d=controller.modelToView(d);
+			// this is an ugly hack to see the circle (determining collisions)
+			// and the image - a wine glass
 			c.drawCircle(d.x, d.y, d.r, diskPaint);
+	        playerD = player.createScaledBitmap(player, (int)d.r, (int)(2*d.r), true);
+			c.drawBitmap(playerD, d.x-d.r/2, d.y-d.r, null);
 		}
+		
+		// draw the squares 
 		for (Square d : model.squares) {
 			d=controller.modelToView(d);
 			c.drawRect(d.x - d.w / 2, (d.y - d.w / 2), d.x + d.w / 2,

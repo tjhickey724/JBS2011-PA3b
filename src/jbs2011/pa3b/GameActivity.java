@@ -64,7 +64,7 @@ public class GameActivity extends Activity {
 		
 		// Next, create the GameView which will draw on the Surface (as a back buffer!)
 		// The view also handles the creation, resize, and destroy events for the surface
-		view = new GameView(controller, holder, model);
+		view = new GameView(this, controller, holder, model);
 		surface.getHolder().addCallback(view);
 		
 
