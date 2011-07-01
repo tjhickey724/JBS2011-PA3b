@@ -114,6 +114,7 @@ public class GameController implements OnTouchListener {
 		float x, y;
 
 
+
 		// get x,y coordinates from view and translate
 		// to model coordinate system (with y=0 on bottom)
 		synchronized(gameModel){
@@ -126,7 +127,16 @@ public class GameController implements OnTouchListener {
 		y = p.y;
         Log.d(TAG,"x="+x+"  y="+y+"h-y="+(height-y)+" currState="+currState+" firstX="+firstX+" firstY="+firstY);
 
+        if (gameModel.disks.size()>0)
+        	currDisk = gameModel.disks.get(0);
+        else
+        	return true;
+        
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			firstX = x;
+			firstY = y;
+			/*
+			startTime = System.currentTimeMillis();
 			Disk d;
 			Square s;
 			d = gameModel.touchingDisk(x, y);
@@ -151,16 +161,20 @@ public class GameController implements OnTouchListener {
 				currState = State.TOUCH_SQUARE;
 				Log.d(TAG,"TOUCH_SQUARE"+s);
 			}
+			*/
 			return true;
 		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+			/*
 			if (currState == State.TOUCH_DISK) {
 				currDisk.move(firstX, firstY);
 			} else if (currState == State.TOUCH_SQUARE) {
 				currSquare.move(x, y);
 			}
+			*/
 			return true;
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
-			if (currState == State.TOUCH_DISK) {
+			
+			//if (currState == State.TOUCH_DISK) {
 				currState = State.WAIT;
 				float dx = x - firstX;
 				float dy = y - firstY;
@@ -170,18 +184,21 @@ public class GameController implements OnTouchListener {
 					currDisk.vy = 200; //dy/dt;
 				}else {
 					currDisk.vx = 0;
-					currDisk.vy = dy/dt;
+					currDisk.vy = 400; //dy/dt;
 				}
 				// currDisk.weightless=false;
 				currDisk = null;
 				return true;
+				/*
 			} else if (currState == State.TOUCH_SQUARE) {
 				currState = State.WAIT;
 				currSquare = null;
 				return true;
 			}
-
 		}
+*/
+		}
+
 		return false;
 		}
 	}
