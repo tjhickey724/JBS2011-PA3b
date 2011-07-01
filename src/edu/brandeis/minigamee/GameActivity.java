@@ -21,7 +21,6 @@ public class GameActivity extends Activity {
 
 	/** Called when the activity is first created. */
 	private SurfaceView surface;
-	private SurfaceHolder holder;
 	private GameModel model;
 	private GameView view;
 	private GameController controller;
