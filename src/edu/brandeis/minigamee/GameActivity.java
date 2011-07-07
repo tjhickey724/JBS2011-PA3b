@@ -21,6 +21,8 @@ public class GameActivity extends Activity {
 
 	/** Called when the activity is first created. */
 	private SurfaceView surface;
+	private SurfaceHolder holder;
+
 	private GameModel model;
 	private GameView view;
 	private GameController controller;
@@ -30,6 +32,7 @@ public class GameActivity extends Activity {
 	private static final String TAG="GA";
 	
 	public GameActivity(GameModel mod, GameController cont, GameView view) {
+		Log.d(TAG, "GameActivity Contructor");
 		model = mod;
 		controller = cont;
 	}
@@ -38,8 +41,16 @@ public class GameActivity extends Activity {
 		return model;
 	}
 	
+	public SurfaceHolder getHolder() {
+		return holder;
+	}
+	
 	public GameController getController() {
 		return controller;
+	}
+	
+	public GameView getView() {
+		return view;
 	}
 
 	public void setKeyResources(int aGameView, int aSurfaceView) {
@@ -55,12 +66,10 @@ public class GameActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		 
-        //  create the view which contqins a game_surface on which the game will be drawn
-//		setContentView(R.layout.game);
+		//  create the view which contqins a game_surface on which the game will be drawn
 		setContentView(gameView);
 		// the drawing surface is created in the xml, get the surface from its ID
-//		surface = (SurfaceView) findViewById(R.id.game_surface);
+
 		surface = (SurfaceView) findViewById(surfaceView);
 
 		holder = surface.getHolder();
@@ -69,9 +78,6 @@ public class GameActivity extends Activity {
 
 		Log.d(TAG,"surface created! ");
 		//model.createLevel(2);
-
-
-
 	}
 	
 	@Override
@@ -92,9 +98,5 @@ public class GameActivity extends Activity {
 		super.onResume();
 		// model.onResume(this);
 	}
-
-	
-
-
 
 }

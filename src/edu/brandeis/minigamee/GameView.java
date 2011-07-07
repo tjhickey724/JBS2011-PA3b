@@ -25,15 +25,12 @@ public class GameView  implements Callback{
 	private Paint backgroundPaint;
 	private Paint diskPaint, squarePaint, targetPaint,textPaint;
 	
-	public GameView(GameController controller,SurfaceHolder holder,GameModel model){
+	public void setContext(GameController controller,SurfaceHolder holder,GameModel model){
 		this.controller=controller;
 		this.holder = holder;
 		this.model=model;
         createPaints();
-        
-
 	}
-
 
 	/**
 	 * When the drawing surface size changes we need to tell the controller so it
