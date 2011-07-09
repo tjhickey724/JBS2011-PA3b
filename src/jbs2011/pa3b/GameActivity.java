@@ -70,9 +70,6 @@ public class GameActivity extends Activity {
 
 		Log.d(TAG,"surface created! ");
 		//model.createLevel(2);
-
-
-
 	}
 	
 	@Override

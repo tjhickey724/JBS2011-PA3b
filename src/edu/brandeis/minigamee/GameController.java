@@ -21,9 +21,9 @@ public abstract class GameController implements OnTouchListener {
 	private GameModel gameModel;
 	private int width, height;
 	private float zoom=1.0f; // this doesn't seem to work correctly with zoom != 1f
-	private final static String TAG="GC";
+	private final static String TAG="MGE-GC";
 
-	abstract String getLogString();
+	abstract protected String getLogString();
 
 	/**
 	 * This processes all user input to the game and uses that input to update the model.
@@ -32,7 +32,14 @@ public abstract class GameController implements OnTouchListener {
 	 * @param gameModel
 	 */
 	public GameController(GameModel gameModel) {
-		this.gameModel = gameModel;
+		setModel(gameModel);
+	}
+	
+	public GameController() {
+	}
+	
+	public void setModel(GameModel theModel) {
+		this.gameModel = theModel;
 	}
 
 	/**

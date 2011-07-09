@@ -12,7 +12,7 @@ import android.util.Log;
  */
 public class GameLoop extends Thread {
 	private volatile boolean running = true;
-	private static final String TAG="GL";
+	private static final String TAG="MGE-GL";
 	GameView view;
 	GameModel model;
 	GameController controller;

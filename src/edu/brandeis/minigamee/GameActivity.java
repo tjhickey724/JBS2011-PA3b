@@ -6,7 +6,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-
 import android.util.Log;
 
 /**
@@ -21,17 +20,20 @@ public class GameActivity extends Activity {
 
 	/** Called when the activity is first created. */
 	private SurfaceView surface;
+	private SurfaceHolder holder;
 	private GameModel model;
 	private GameView view;
 	private GameController controller;
 	
-	private int gameView, surfaceView;
+	private int gameViewId, surfaceViewId;
 
-	private static final String TAG="GA";
+	private static final String TAG="MGE";
 	
-	public GameActivity(GameModel mod, GameController cont, GameView view) {
-		model = mod;
-		controller = cont;
+	public GameActivity(GameModel theMod, GameController theCont, GameView theView) {
+		Log.d(TAG,"GameActivity constructor");
+		model = theMod;
+		controller = theCont;
+		view = theView;
 	}
 	
 	public GameModel getModel() {
@@ -43,8 +45,8 @@ public class GameActivity extends Activity {
 	}
 
 	public void setKeyResources(int aGameView, int aSurfaceView) {
-		this.gameView = aGameView;
-		this.surfaceView = aSurfaceView;
+		this.gameViewId = aGameView;
+		this.surfaceViewId = aSurfaceView;
 	}
 	
 	/**
@@ -54,24 +56,12 @@ public class GameActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		 
-        //  create the view which contqins a game_surface on which the game will be drawn
-//		setContentView(R.layout.game);
-		setContentView(gameView);
-		// the drawing surface is created in the xml, get the surface from its ID
-//		surface = (SurfaceView) findViewById(R.id.game_surface);
-		surface = (SurfaceView) findViewById(surfaceView);
-
+		Log.d(TAG, "onCreate");
+		setContentView(gameViewId);
+		surface = (SurfaceView) findViewById(surfaceViewId);
 		holder = surface.getHolder();
 		surface.getHolder().addCallback(view);
-		
-
 		Log.d(TAG,"surface created! ");
-		//model.createLevel(2);
-
-
-
 	}
 	
 	@Override

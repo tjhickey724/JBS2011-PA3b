@@ -33,8 +33,6 @@ public class GameView  implements Callback{
 		this.holder = holder;
 		this.model=model;
         createPaints();
-        
-
 	}
 
 
@@ -56,8 +54,8 @@ public class GameView  implements Callback{
 	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 		if (gameLoop == null) {
-		gameLoop = new GameLoop(this,model,controller);
-		gameLoop.start();
+			gameLoop = new GameLoop(this,model,controller);
+			gameLoop.start();
 		}
 
 	}

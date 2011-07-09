@@ -3,12 +3,13 @@ package edu.brandeis.minigamee;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
 
 /**
- * This class implements the view of the game. Its main purpose is to know
+ * This class implements the view of the game. Its main purpose is to know 
  * how to draw a representation of the model onto the Surface when called to do so.
  * It also responds to the events generated with the surface is created, changed, destroyed.
  * It reads from the model but does not change anything in the model. The view also starts
@@ -22,17 +23,26 @@ public class GameView  implements Callback{
 	private SurfaceHolder holder;
 	private GameModel model;
 	private GameLoop gameLoop;
+	
 	private Paint backgroundPaint;
-	private Paint diskPaint, squarePaint, targetPaint,textPaint;
+	private Paint textPaint;
+	private String TAG="MGE-GV";
 	
 	public GameView(GameController controller,SurfaceHolder holder,GameModel model){
+		reset(controller, holder, model);
+	}
+	
+	public GameView() {
+	}
+	
+	public void reset(GameController controller,SurfaceHolder holder,GameModel model) {
 		this.controller=controller;
 		this.holder = holder;
-		this.model=model;
+		this.model = model;
         createPaints();
-        
 
 	}
+
 
 
 	/**
@@ -84,15 +94,18 @@ public class GameView  implements Callback{
 
 	/*
 	 * The drawing method simply draws the disks, squares, and targets
-	 * after it paints the entire screen with the background color
+	 * after it paints the entire screen with the background color.
 	 */
 	private void doDraw(Canvas c) {
 		int width = c.getWidth();
 		int height = c.getHeight();
 		controller.setSize(width, height);
 
-		//Log.d("GA","w="+width+" h="+height);
+		Log.d(TAG,"w="+width+" h="+height);
+		c.drawRect(0, 0, width, height, backgroundPaint);
 		
+		c.drawText("["+Math.round(model.timeRemaining)+"] win="+model.wins+" lose="+model.losses,0,50,textPaint);
+
 	}
 
 	/**
@@ -113,19 +126,6 @@ public class GameView  implements Callback{
 	private void createPaints(){
 		backgroundPaint = new Paint();
 		backgroundPaint.setColor(Color.BLUE);
-
-		diskPaint = new Paint();
-		diskPaint.setColor(Color.BLACK);
-		diskPaint.setAntiAlias(true);
-
-		squarePaint = new Paint();
-		squarePaint.setColor(Color.WHITE);
-		squarePaint.setAntiAlias(true);
-
-		targetPaint = new Paint();
-		targetPaint.setColor(Color.RED);
-		targetPaint.setAntiAlias(true);
-		
 		textPaint = new Paint();
 		textPaint.setColor(Color.GREEN);
 		textPaint.setAntiAlias(true);
