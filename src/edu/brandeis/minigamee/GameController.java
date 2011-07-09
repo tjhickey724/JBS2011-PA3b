@@ -16,14 +16,16 @@ import android.util.Log;
  * @author tim
  *
  */
-public abstract class GameController implements OnTouchListener {
+public class GameController implements OnTouchListener {
 
 	private GameModel gameModel;
 	private int width, height;
 	private float zoom=1.0f; // this doesn't seem to work correctly with zoom != 1f
 	private final static String TAG="MGE-GC";
 
-	abstract protected String getLogString();
+	public String getLogString() {
+		return "[no log string defined yet]";
+	}
 
 	/**
 	 * This processes all user input to the game and uses that input to update the model.
@@ -89,6 +91,7 @@ public abstract class GameController implements OnTouchListener {
 	public boolean onTouch(View v, MotionEvent event) {
         PointF p;
 		float x, y;
+		Log.d(TAG, "GameController onTouch");
 
 		// get x,y coordinates from view and translate
 		// to model coordinate system (with y=0 on bottom)

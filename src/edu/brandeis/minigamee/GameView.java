@@ -28,23 +28,13 @@ public class GameView  implements Callback{
 	private Paint textPaint;
 	private String TAG="MGE-GV";
 	
-	public GameView(GameController controller,SurfaceHolder holder,GameModel model){
-		reset(controller, holder, model);
-	}
-	
-	public GameView() {
-	}
-	
-	public void reset(GameController controller,SurfaceHolder holder,GameModel model) {
+	public void setContext(GameController controller,SurfaceHolder holder,GameModel model){
 		this.controller=controller;
 		this.holder = holder;
 		this.model = model;
         createPaints();
-
 	}
-
-
-
+1be018753fa7b0a0853b0e78c
 	/**
 	 * When the drawing surface size changes we need to tell the controller so it
 	 * can adjust the mapping between the view and the model

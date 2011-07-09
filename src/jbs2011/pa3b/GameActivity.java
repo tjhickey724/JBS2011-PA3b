@@ -90,9 +90,4 @@ public class GameActivity extends Activity {
 		super.onResume();
 		// model.onResume(this);
 	}
-
-	
-
-
-
 }

@@ -29,19 +29,26 @@ public class GameActivity extends Activity {
 
 	private static final String TAG="MGE";
 	
-	public GameActivity(GameModel theMod, GameController theCont, GameView theView) {
-		Log.d(TAG,"GameActivity constructor");
-		model = theMod;
-		controller = theCont;
-		view = theView;
+	public GameActivity(GameModel mod, GameController cont, GameView view) {
+		Log.d(TAG, "GameActivity Contructor");
+		model = mod;
+		controller = cont;
 	}
 	
 	public GameModel getModel() {
 		return model;
 	}
 	
+	public SurfaceHolder getHolder() {
+		return holder;
+	}
+	
 	public GameController getController() {
 		return controller;
+	}
+	
+	public GameView getView() {
+		return view;
 	}
 
 	public void setKeyResources(int aGameView, int aSurfaceView) {
@@ -82,9 +89,5 @@ public class GameActivity extends Activity {
 		super.onResume();
 		// model.onResume(this);
 	}
-
-	
-
-
 
 }
