@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, GameActivity!</string>
-    <string name="app_name">PA3</string>
+    <string name="app_name">TJH Mazeball</string>
     <string name="button1">PLAY GAME</string>
+    <string name="play">PLAY</string>
+    <string name="newgame">Click here to start playing!</string>
+    <string name="about">About</string>
 </resources>

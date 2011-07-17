@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/PA3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JBS2011-PA2"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
