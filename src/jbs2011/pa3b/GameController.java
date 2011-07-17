@@ -2,11 +2,14 @@ package jbs2011.pa3b;
 
 import jbs2011.pa3.Disk;
 import jbs2011.pa3.GameModel;
-import jbs2011.pa3.Square;
+import jbs2011.pa3.Rectangle;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.os.Handler;
 
 import android.graphics.PointF;
 
@@ -23,14 +26,17 @@ import android.util.Log;
 public class GameController implements OnTouchListener {
 
 	private State currState;
-	private float firstX, firstY;
+	private float firstX, firstY,lastX,lastY;
 	private GameModel gameModel;
 	private Disk currDisk;
-	private Square currSquare;
+	private Rectangle currSquare;
 	private int width, height;
 	private float zoom=1.0f; // this doesn't seem to work correctly with zoom != 1f
 	private final static String TAG="GC";
 	long startTime=0;
+	private Handler handler;
+	private GameActivity ga;
+	private boolean diskHitWall;
 
 	/**
 	 * This processes all user input to the game and uses that input to update the model.
@@ -38,11 +44,13 @@ public class GameController implements OnTouchListener {
 	 * to keep track of the currently "selected" disk or square...
 	 * @param gameModel
 	 */
-	public GameController(GameModel gameModel) {
+	public GameController(Handler handler, GameActivity ga, GameModel gameModel) {
 		this.gameModel = gameModel;
 		currState = State.WAIT;
 		currDisk = null;
 		currSquare = null;
+		this.handler=handler;
+		this.ga = ga;
 	}
 
 	/**
@@ -90,8 +98,8 @@ public class GameController implements OnTouchListener {
 	 * @param s
 	 * @return new square
 	 */
-	public Square modelToView(Square s){
-		return new Square(s.x/zoom,height-s.y/zoom,s.w/zoom,s.isTarget);
+	public Rectangle modelToView(Rectangle s){
+		return new Rectangle(s.x/zoom,height-s.y/zoom,s.w/zoom,s.h/zoom,s.isTarget);
 	}
 	
 	
@@ -122,6 +130,13 @@ public class GameController implements OnTouchListener {
 			// raw coordinates have the origin (0,0) at the upper left corner, but the
 			// model system has it at the lower left corner.
 			// The View may need to use this transformation to draw on the screen.....
+			//if (gameModel.beforeGame || gameModel.levelOver){ 
+			//	startNewGame();
+			//	return true;
+			//}
+			
+			if (gameModel.diskWallCollision) diskHitWall=true;
+			
 		p = viewToModel(new PointF(event.getX(),event.getY()));
 		x = p.x;
 		y = p.y;
@@ -133,8 +148,15 @@ public class GameController implements OnTouchListener {
         	return true;
         
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			// touching anywhere stops the main disk...
 			firstX = x;
 			firstY = y;
+			lastX = x;
+			lastY = y;
+			// stop the disk if you touch the screen
+			currDisk.vx=0;
+			currDisk.vy=0;
+			startTime = System.currentTimeMillis();
 			/*
 			startTime = System.currentTimeMillis();
 			Disk d;
@@ -164,6 +186,19 @@ public class GameController implements OnTouchListener {
 			*/
 			return true;
 		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+			// barely moving doesn't count, it resets the timer and position
+			long currTime = System.currentTimeMillis();
+			//if (Math.abs(x-firstX)+Math.abs(y-firstY)<100*(currTime-startTime)/1000f){
+				float dx = x-lastX; 
+				float dy=y-lastY;
+				lastX=x; lastY=y;
+				if (!diskHitWall){ 
+					currDisk.move(currDisk.x+dx, currDisk.y+dy);
+				}
+		
+
+			//}
+			
 			/*
 			if (currState == State.TOUCH_DISK) {
 				currDisk.move(firstX, firstY);
@@ -173,21 +208,23 @@ public class GameController implements OnTouchListener {
 			*/
 			return true;
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
-			
+			// when you let go, you fling the disk!
 			//if (currState == State.TOUCH_DISK) {
 				currState = State.WAIT;
 				float dx = x - firstX;
 				float dy = y - firstY;
 				float dt = (System.currentTimeMillis() - startTime)/500f;
-				if (Math.abs(dx)<20){
-					currDisk.vx = 0;
-					currDisk.vy = 200; //dy/dt;
-				}else {
-					currDisk.vx = 0;
-					currDisk.vy = 400; //dy/dt;
+				//if (Math.abs(dx)<20){
+				//	currDisk.vx = dx/dt;
+				//	currDisk.vy = dy/dt; //dy/dt;
+				//}else 
+				{
+					currDisk.vx = dx/dt;
+					currDisk.vy = dy/dt; //dy/dt;
 				}
 				// currDisk.weightless=false;
 				currDisk = null;
+				diskHitWall=false;
 				return true;
 				/*
 			} else if (currState == State.TOUCH_SQUARE) {
@@ -208,19 +245,28 @@ public class GameController implements OnTouchListener {
 	 * It resets the game and creates a new level. Another possibility would be to go to a level completed activity....
 	 * but we don't do that yet...
 	 */
-	public void levelOver(){
-		// this is called by the model when the user wins the game!
-		if (gameModel.levelOver){
-			synchronized(gameModel){
-
+	public void startNewGame(){
+		
 			gameModel.resetGame();
-			gameModel.createLevel(2,width,height);
-			for(Square s:gameModel.targets){
-				Log.d(TAG,"target = "+s);
-			}
+			gameModel.createLevel(1,width,height);
 			gameModel.levelOver=false;
-			}
-			
-		}
+			gameModel.beforeGame = false;
+	
 	}
+	
+
+
+			
+		
+		
+		public void finishGame() {
+			gameModel.resetGame();
+			gameModel.levelOver=false;
+			gameModel.beforeGame = true;
+			startNewGame();
+			//ga.startActivity(new Intent(ga, Levels.class));
+			//ga.finish();
+			//handler.post(new Runnable(){public void run() {ga.goToLevel();}});
+		}
+
 }

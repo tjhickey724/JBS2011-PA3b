@@ -2,7 +2,7 @@ package jbs2011.pa3b;
 
 import jbs2011.pa3.GameModel;
 import jbs2011.pa3.Disk;
-import jbs2011.pa3.Square;
+import jbs2011.pa3.Rectangle;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 
 
@@ -32,11 +33,13 @@ public class GameView  implements Callback{
 	private Paint backgroundPaint;
 	private Paint diskPaint, squarePaint, targetPaint,textPaint;
 	private Bitmap background,backgroundD,player,playerD;
+	private GameActivity gameActivity;
 	
-	public GameView(Context context, GameController controller,SurfaceHolder holder,GameModel model){
+	public GameView(GameActivity context, GameController controller,SurfaceHolder holder,GameModel model){
 		this.controller=controller;
 		this.holder = holder;
 		this.model=model;
+		this.gameActivity=context;
         createPaints();
         background = BitmapFactory.decodeResource(context.getResources(), R.drawable.castle);
         player = BitmapFactory.decodeResource(context.getResources(), R.drawable.wine);
@@ -54,6 +57,7 @@ public class GameView  implements Callback{
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		controller.setSize(width, height);
+//		model.createLevel(1,width,height);
 
 	}
 
@@ -65,8 +69,10 @@ public class GameView  implements Callback{
 	 */
 	public void surfaceCreated(SurfaceHolder holder) {
 		if (gameLoop == null) {
-		gameLoop = new GameLoop(this,model,controller);
+		gameLoop = new GameLoop(gameActivity,this,model,controller);
 		gameLoop.start();
+
+		
 		}
 
 	}
@@ -107,38 +113,59 @@ public class GameView  implements Callback{
 
 		// draw the background (tiled)
 		c.drawRect(0, 0, width, height, backgroundPaint);	
-        backgroundD = background.createScaledBitmap(background, (int)width, (int)height, true);
+		
+		if (model.levelOver){
+			c.drawText("GAME OVER! score:"+model.score+" Best score:"+model.bestscore,0,50,textPaint);
+		}else{
+			c.drawText("  SCORE: "+ model.score+" || TIME LEFT: "+ model.timeRemaining ,0,50,textPaint);
 
-		c.drawBitmap(backgroundD, model.backgroundOffset, 0, null);
-		c.drawBitmap(backgroundD , model.backgroundOffset+model.backgroundWidth, 0, null);
+		}
+		
+		if (model.levelOver) return;
+      // backgroundD = background.createScaledBitmap(background, (int)width, (int)height, true);
+
+	//	c.drawBitmap(backgroundD, model.backgroundOffset, 0, null);
+	//	c.drawBitmap(backgroundD , model.backgroundOffset+model.backgroundWidth, 0, null);
 		//c.drawBitmap(backgroundD , model.backgroundOffset2, height/4f, null);
 		//c.drawBitmap(backgroundD , model.backgroundOffset2+model.backgroundWidth, height/4f, null);
 
 		//draw the disks
-		for (Disk d : model.disks) {
-			d=controller.modelToView(d);
+		for (Disk d1 : model.disks) {
+			Disk d=controller.modelToView(d1);
 			// this is an ugly hack to see the circle (determining collisions)
 			// and the image - a wine glass
 			c.drawCircle(d.x, d.y, d.r, diskPaint);
-	        playerD = player.createScaledBitmap(player, (int)d.r, (int)(2*d.r), true);
-			c.drawBitmap(playerD, d.x-d.r/2, d.y-d.r, null);
+	       // playerD = player.createScaledBitmap(player, (int)d.r, (int)(2*d.r), true);
+		//	c.drawBitmap(playerD, d.x-d.r/2, d.y-d.r, null);
 		}
 		
 		// draw the squares 
-		for (Square d : model.squares) {
-			d=controller.modelToView(d);
-			c.drawRect(d.x - d.w / 2, (d.y - d.w / 2), d.x + d.w / 2,
-					(d.y + d.w / 2), squarePaint);
+		for (int i=0; i<model.squares.size(); i++) {
+			Rectangle d1 = model.squares.get(i);
+			Rectangle d = controller.modelToView(d1);
+			c.drawRect(d.x - d.w / 2, (d.y - d.h / 2),d.x +d.w/2,
+					(d.y + d.h / 2), squarePaint);
 		}
-		for (Square d : model.targets) {
-			d=controller.modelToView(d);
-			c.drawRect(d.x - d.w / 2, (d.y - d.w / 2), d.x + d.w / 2,
-					(d.y + d.w / 2), targetPaint);
+		for (int i=0;i<model.targets.size(); i++){
+			Rectangle d1 = model.targets.get(i);
+			Rectangle d=controller.modelToView(d1);
+			c.drawRect(d.x - d.w / 2, (d.y - d.h / 2),d.x+d.w/2,
+					d.y + d.h / 2, targetPaint); 
 		}
 		
-		c.drawText("["+Math.round(model.timeRemaining)+"] win="+model.wins+" lose="+model.losses,0,50,textPaint);
-	}
 
+		// play sound effects
+		if (model.diskWallCollision)
+		{
+			Log.d("GV","dwc=true");
+			//SoundManager.playSound(1); // find a better sound!
+			model.diskWallCollision=false;
+		}
+		if (model.diskTargetCollision){
+			SoundManager.playSound(2);
+			model.diskTargetCollision=false;
+		}
+	}
 	/**
 	 * When the surface is destroyed we stop the game loop
 	 */
@@ -163,7 +190,7 @@ public class GameView  implements Callback{
 		diskPaint.setAntiAlias(true);
 
 		squarePaint = new Paint();
-		squarePaint.setColor(Color.WHITE);
+		squarePaint.setColor(Color.YELLOW);
 		squarePaint.setAntiAlias(true);
 
 		targetPaint = new Paint();

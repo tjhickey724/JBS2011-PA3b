@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 import jbs2011.pa3.GameModel;
 import android.util.Log;
 
-
 /*
  * The Game loop simply draws the screen and updates the game continuously ..
  * It polls a variable running though and will exit the loop if running is set to false.
@@ -14,26 +13,31 @@ import android.util.Log;
  */
 public class GameLoop extends Thread {
 	private volatile boolean running = true;
-	private static final String TAG="GL";
+	private static final String TAG = "GL";
 	GameView view;
 	GameModel model;
 	GameController controller;
-/**
- * This defines the main loop of the game.
- * It runs a simple loop where it draws the view,
- * then updates the model until the model states the
- * level is over, at which point it informs the controller
- * which will reset the model and start over...
- * @param view
- * @param model
- * @param controller
- */
-	public GameLoop(GameView view, GameModel model, GameController controller){
-		this.model = model; this.controller= controller;
+	GameActivity ga;
+
+	/**
+	 * This defines the main loop of the game. It runs a simple loop where it
+	 * draws the view, then updates the model until the model states the level
+	 * is over, at which point it informs the controller which will reset the
+	 * model and start over...
+	 * 
+	 * @param view
+	 * @param model
+	 * @param controller
+	 */
+	public GameLoop(GameActivity ga, GameView view, GameModel model,
+			GameController controller) {
+		this.model = model;
+		this.controller = controller;
 		this.view = view;
-		Log.d(TAG,"starting another GameLoop");
+		this.ga = ga;
+		Log.d(TAG, "starting another GameLoop");
 	}
-	
+
 	/**
 	 * the main draw/update until done loop
 	 */
@@ -41,15 +45,24 @@ public class GameLoop extends Thread {
 		while (running) {
 			try {
 				TimeUnit.MILLISECONDS.sleep(10);
-				synchronized(view){
-				view.draw();
+				synchronized (view) {
+					view.draw();
 				}
+				//if (model.beforeGame)
+				//	continue;
+				//else 
 				if (!model.levelOver)
-					synchronized(model){
-				     model.updateGame(System.currentTimeMillis());
+					synchronized (model) {
+						model.updateGame(System.currentTimeMillis());
 					}
-				else controller.levelOver();
+				else if (model.levelOver) {
+					//Log.d("GL", "game over!");
+					//controller.startNewGame();
 					
+
+
+				}
+
 				/*
 				 * model.updateBubbles();
 				 */
@@ -61,9 +74,8 @@ public class GameLoop extends Thread {
 	}
 
 	/**
-	 * if we need to exit the loop gracefully, this method
-	 * allows one to stop the loop without killing the 
-	 * thread directly.
+	 * if we need to exit the loop gracefully, this method allows one to stop
+	 * the loop without killing the thread directly.
 	 */
 	public void safeStop() {
 		running = false;
